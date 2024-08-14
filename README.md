@@ -20,6 +20,6 @@ On macOS, both `ffmpeg` and `poppler` are available via `homebrew`.
 ## TTS Engine
 This uses [CoquiAI's XTTS2](https://github.com/coqui-ai/TTS) to generate speech.
 
-The default XTTS2 model has a bug where it hallucinates random speech if the text is short. This is not something I can fix.
+The default XTTS2 model has a bug where it hallucinates random speech if the text is short. This is not something I can fix. A trick to avoid this is combining short sentences together with commas.
 
 However, the speech generation logic is encapsulated in an engine class and can be swapped for other implementations easily.
