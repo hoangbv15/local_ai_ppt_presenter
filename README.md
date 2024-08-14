@@ -1,6 +1,6 @@
 # PPT Presenter
 
-PPT Presenter converts a `.pptx` file to a video, and read out speaker's notes along slides using text to speech technique.
+PPT Presenter converts a `.pptx` file to a video, and read out speaker's notes along slides using local AI text to speech technique.
 
 ## Usage
 
