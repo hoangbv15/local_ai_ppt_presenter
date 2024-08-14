@@ -11,7 +11,7 @@ from pptx import Presentation
 from ttsgen import TTSGen
 from ttsgenxtts2engine import TTSGenXTTS2Engine
 
-__author__ = ['chaonan99']
+__author__ = ['hoangbv15']
 
 ## Sometimes ffmpeg is avconv
 FFMPEG_NAME = 'ffmpeg'
