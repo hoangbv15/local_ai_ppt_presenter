@@ -13,6 +13,7 @@ class TTSGenXTTS2Engine:
             return
 
         self.tts.tts_to_file(text=text, 
-                        speaker_wav="voices/hoang_01.wav", 
+                        speaker_wav="voices/f-us-2.wav", 
                         language="en", 
-                        file_path=output_file)
+                        file_path=output_file,
+                        top_k=25, top_p=0.5)
