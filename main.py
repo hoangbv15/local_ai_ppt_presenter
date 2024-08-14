@@ -9,6 +9,7 @@ from subprocess import call
 from pdf2image import convert_from_path
 from pptx import Presentation
 from ttsgen import TTSGen
+from ttsgenxtts2engine import TTSGenXTTS2Engine
 
 __author__ = ['chaonan99']
 
@@ -25,7 +26,7 @@ def ppt_presenter(pptx_path, pdf_path, output_path):
         prs = Presentation(pptx_path)
         assert len(images_from_path) == len(prs.slides)
 
-        tts = TTSGen()
+        tts = TTSGen(TTSGenXTTS2Engine())
         tts.enable(True)
         for i, (slide, image) in enumerate(zip(prs.slides, images_from_path)):
             if slide.has_notes_slide:
