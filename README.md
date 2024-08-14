@@ -15,6 +15,16 @@ pip install -r requirements.txt
 ```
 * You also need [`ffmpeg`](https://github.com/adaptlearning/adapt_authoring/wiki/Installing-FFmpeg) and [`poppler`](https://poppler.freedesktop.org/)
 On macOS, both `ffmpeg` and `poppler` are available via `homebrew`.
+* To execute the script with the example inputs, run
+```
+python main.py --pptx example/test.pptx --pdf example/test.pdf -o test.mp4
+```
+To use a location in ram for temporary files, first create a ram disk
+```
+diskutil erasevolume HFS+ RamDisk $(hdiutil attach -nomount ram://33554432)
+```
+Then add a parameter to the script with `-t /Volumes/RamDisk/`
+
 * Watch the video `example/test.mp4` (created by `local_ai_ppt_presenter`)
 
 ## TTS Engine
