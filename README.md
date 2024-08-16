@@ -39,7 +39,7 @@ The default XTTS2 model has a bug where it hallucinates random speech if the tex
 However, the speech generation logic is encapsulated in an engine class and can be swapped for other implementations easily.
 
 ### Voice cloning
-Record an audio clip of you reading something. It can be from 10 seconds upwards, the longer and more diversed the words, the better. Then modify the path to the voice clip in `ttsgenxtts2engine.py` and run the script.
+Record an audio clip of you reading something. It can be from 10 seconds upwards, the longer and more diversed the words, the better. Then modify the path to the voice clip in `xtts2_engine.py` and run the script.
 
 Here is an example paragraph that you can read to make a voice sample:
 
