@@ -19,11 +19,15 @@ On macOS, both `ffmpeg` and `poppler` are available via `homebrew`.
 ```
 python main.py --pptx example/test.pptx --pdf example/test.pdf -o test.mp4
 ```
-To use a location in ram for temporary files, first create a ram disk
+To use a location in ram for temporary files, first create a ram disk.
+On macOS:
 ```
 diskutil erasevolume HFS+ RamDisk $(hdiutil attach -nomount ram://33554432)
 ```
-Then add a parameter to the script with `-t /Volumes/RamDisk/`
+On Windows, download & install [ImDisk Toolkit](https://sourceforge.net/projects/imdisk-toolkit/)
+
+Then add a parameter to the script with the path to the ramdisk. 
+For instance, on macOS: `-t /Volumes/RamDisk/` and on Windows: `-t R:\`
 
 * Watch the video `example/test.mp4` (created by `local_ai_ppt_presenter`)
 

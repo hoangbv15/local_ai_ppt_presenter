@@ -12,7 +12,4 @@ class TTSGen:
         if not self.enabled:
             return
 
-        if not self.engine.isInitialised:
-            self.engine.initialise()
-
         self.engine.generate(text, output_file)

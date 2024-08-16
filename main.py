@@ -9,7 +9,8 @@ from subprocess import call
 from pdf2image import convert_from_path
 from pptx import Presentation
 from ttsgen import TTSGen
-from ttsgenxtts2engine import TTSGenXTTS2Engine
+from engines.xtts2_engine import XTTS2Engine
+from engines.gtts_engine import GTTSEngine
 
 __author__ = ['hoangbv15']
 
@@ -18,13 +19,19 @@ FFMPEG_NAME = 'ffmpeg'
 #FFMPEG_NAME = 'avconv'
 
 
-def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir=None):
+def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast):
+    if fast:
+        tts = TTSGen(GTTSEngine())
+    elif engineName:
+        engine = globals()[engineName]
+        tts = TTSGen(engine())
+    else:
+        tts = TTSGen(XTTS2Engine())
+
     with tempfile.TemporaryDirectory(dir=temp_dir) as temp_path:
         images_from_path = convert_from_path(pdf_path)
         prs = Presentation(pptx_path)
         assert len(images_from_path) == len(prs.slides)
-
-        tts = TTSGen(TTSGenXTTS2Engine())
         tts.enable(True)
         for i, (slide, image) in enumerate(zip(prs.slides, images_from_path)):
             if slide.has_notes_slide:
@@ -65,8 +72,11 @@ def main():
     parser.add_argument('--pdf', help='input pdf path')
     parser.add_argument('-o', '--output', help='output path')
     parser.add_argument('-t', '--tempdir', help='path to store temporary files needed to generate the output. A ramdisk is recommended. Leave none to use python tempfile defaults.')
+    parser.add_argument('-e', '--engine', help='the name of the text to speech engine to use')
+    parser.add_argument('-f', '--fast', help='use the text to speech engine of the OS for fast execution at the expense of quality', action='store_true')
     args = parser.parse_args()
-    ppt_presenter(args.pptx, args.pdf, args.output, args.tempdir)
+
+    ppt_presenter(args.pptx, args.pdf, args.output, args.tempdir, args.engine, args.fast)
 
 
 if __name__ == '__main__':
