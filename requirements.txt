@@ -1,4 +1,4 @@
 pdf2image
 python-pptx
-TTS
+TTS # CoquiTTS
 gTTS
