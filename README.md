@@ -29,6 +29,12 @@ On Windows, download & install [ImDisk Toolkit](https://sourceforge.net/projects
 Then add a parameter to the script with the path to the ramdisk. 
 For instance, on macOS: `-t /Volumes/RamDisk/` and on Windows: `-t R:\`
 
+As a final example of a command I would frequently use on my mac:
+```
+python main.py --pptx example/test.pptx --pdf example/test.pdf -o /Volumes/Ramdisk/test.mp4 -t /Volumes/RamDisk/
+```
+The above command will convert the test.pptx file in the example folder into a video that lives in the ramdisk, using also the ramdisk for temp files.
+
 * Watch the video `example/test.mp4` (created by `local_ai_ppt_presenter`)
 
 ## TTS Engine

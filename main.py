@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+from pathlib import Path
 import tempfile
 import argparse
 from subprocess import call
@@ -19,7 +20,7 @@ FFMPEG_NAME = 'ffmpeg'
 #FFMPEG_NAME = 'avconv'
 
 
-def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast):
+def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast, noconcat, pageno):
     if fast:
         tts = TTSGen(GTTSEngine())
     elif engineName:
@@ -34,6 +35,9 @@ def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast):
         assert len(images_from_path) == len(prs.slides)
         tts.enable(True)
         for i, (slide, image) in enumerate(zip(prs.slides, images_from_path)):
+            if pageno and i != int(pageno):
+                continue
+
             if slide.has_notes_slide:
                 notes = slide.notes_slide.notes_text_frame.text
                 image_path = os.path.join(temp_path, 'frame_{}.jpg'.format(i))
@@ -45,6 +49,19 @@ def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast):
                              output_file=audio_path)
 
                 ffmpeg_call(image_path, audio_path, temp_path, i)
+        
+        if noconcat:
+            print("noconcat option is set, skipping the concatenating step.")
+            if not os.path.exists(output_path):
+                os.makedirs(output_path)
+
+            src_path = Path(temp_path)
+            dest_path = Path(output_path)
+            for each_file in src_path.glob('*.mp4'):
+                print("Moving % s to % s" % (each_file.name, output_path))
+                each_file.rename(dest_path.joinpath(each_file.name))
+
+            return
 
         video_list = [os.path.join(temp_path, 'frame_{}.ts'.format(i)) \
                       for i in range(len(images_from_path))]
@@ -74,9 +91,12 @@ def main():
     parser.add_argument('-t', '--tempdir', help='path to store temporary files needed to generate the output. A ramdisk is recommended. Leave none to use python tempfile defaults.')
     parser.add_argument('-e', '--engine', help='the name of the text to speech engine to use')
     parser.add_argument('-f', '--fast', help='use the text to speech engine of the OS for fast execution at the expense of quality', action='store_true')
+    parser.add_argument('-nc', '--noconcat', help='do not combine the sections into a single video', action='store_true')
+    parser.add_argument('-p', '--pageno', help='only regenerate the given page number')
     args = parser.parse_args()
 
-    ppt_presenter(args.pptx, args.pdf, args.output, args.tempdir, args.engine, args.fast)
+    ppt_presenter(args.pptx, args.pdf, args.output, args.tempdir, 
+                args.engine, args.fast, args.noconcat, args.pageno)
 
 
 if __name__ == '__main__':
