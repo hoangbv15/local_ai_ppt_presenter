@@ -57,7 +57,7 @@ def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast, 
 
             src_path = Path(temp_path)
             dest_path = Path(output_path)
-            for each_file in src_path.glob('*.mp4'):
+            for each_file in src_path.glob('*.*'):
                 print("Moving % s to % s" % (each_file.name, output_path))
                 each_file.rename(dest_path.joinpath(each_file.name))
 
