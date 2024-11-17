@@ -20,7 +20,7 @@ FFMPEG_NAME = 'ffmpeg'
 #FFMPEG_NAME = 'avconv'
 
 
-def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast, saveclips, pageno):
+def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast, saveclips, pagenos):
     if fast:
         tts = TTSGen(GTTSEngine())
     elif engineName:
@@ -33,11 +33,6 @@ def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast, 
         images_from_path = convert_from_path(pdf_path)
         prs = Presentation(pptx_path)
         assert len(images_from_path) == len(prs.slides)
-
-        pagenos = []
-        if pageno:
-            for page in pageno.split(','):
-                pagenos.append(int(page))    
 
         tts.enable(True)
         for i, (slide, image) in enumerate(zip(prs.slides, images_from_path)):
@@ -100,8 +95,20 @@ def main():
     parser.add_argument('-p', '--pageno', help='only regenerate the given page number')
     args = parser.parse_args()
 
+    pagenos = []
+    if args.pageno:
+        for page in args.pageno.split(','):
+            r = page.split('-')
+            if len(r) > 1:
+                for i in range(int(r[0]) - 1, int(r[1])):
+                    pagenos.append(i)
+                continue
+            pagenos.append(int(page) - 1)
+        args.saveclips = True
+        print('Page list: % s' % pagenos)
+
     ppt_presenter(args.pptx, args.pdf, args.output, args.tempdir, 
-                args.engine, args.fast, args.saveclips, args.pageno)
+                args.engine, args.fast, args.saveclips, pagenos)
 
 
 if __name__ == '__main__':

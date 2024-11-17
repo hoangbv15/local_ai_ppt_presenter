@@ -13,6 +13,10 @@ cd local_ai_ppt_presenter
 ```
 pip install -r requirements.txt
 ```
+Update: Seems like this command will now fail due to spacy, so use this instead
+```
+pip install -r requirements.txt --only-binary spacy
+```
 * You also need [`ffmpeg`](https://github.com/adaptlearning/adapt_authoring/wiki/Installing-FFmpeg) and [`poppler`](https://poppler.freedesktop.org/)
 On macOS, both `ffmpeg` and `poppler` are available via `homebrew`.
 * To execute the script with the example inputs, run
@@ -34,6 +38,9 @@ As a final example of a command I would frequently use on my mac:
 python main.py --pptx example/test.pptx --pdf example/test.pdf -o /Volumes/Ramdisk/test.mp4 -t /Volumes/RamDisk/
 ```
 The above command will convert the test.pptx file in the example folder into a video that lives in the ramdisk, using also the ramdisk for temp files.
+```
+python main.py --pptx /Volumes/RamDisk/test.pptx --pdf /Volumes/RamDisk/test.pdf -o /Volumes/Ramdisk/test.mp4 -t /Volumes/RamDisk/
+```
 
 * Watch the video `example/test.mp4` (created by `local_ai_ppt_presenter`)
 
