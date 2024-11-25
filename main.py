@@ -41,17 +41,17 @@ def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast, 
 
             if slide.has_notes_slide:
                 notes = slide.notes_slide.notes_text_frame.text
-                image_path = os.path.join(temp_path, 'frame_{}.jpg'.format(i))
-                audio_path = os.path.join(temp_path, 'frame_{}.wav'.format(i))
+                image_path = os.path.join(temp_path, 'frame_{}.jpg'.format(i+1))
+                audio_path = os.path.join(temp_path, 'frame_{}.wav'.format(i+1))
 
                 image.save(image_path)
 
                 tts.generate(text=notes,
                              output_file=audio_path)
 
-                ffmpeg_call(image_path, audio_path, temp_path, i)
+                ffmpeg_call(image_path, audio_path, temp_path, i+1)
 
-        video_list = [os.path.join(temp_path, 'frame_{}.ts'.format(i)) \
+        video_list = [os.path.join(temp_path, 'frame_{}.ts'.format(i+1)) \
                       for i in range(len(images_from_path))]
         video_list_str = 'concat:' + '|'.join(video_list)
         ffmpeg_concat(video_list_str, output_path)
