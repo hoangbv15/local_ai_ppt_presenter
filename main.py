@@ -20,12 +20,11 @@ FFMPEG_NAME = 'ffmpeg'
 #FFMPEG_NAME = 'avconv'
 
 
-def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast, saveclips, pagenos):
+def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast, saveclips, pagenos, saveaudio):
     if fast:
         tts = TTSGen(GTTSEngine())
     elif engineName:
         engine = globals()[engineName]
-        tts = TTSGen(engine())
     else:
         tts = TTSGen(XTTS2Engine())
 
@@ -41,13 +40,13 @@ def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast, 
 
             if slide.has_notes_slide:
                 notes = slide.notes_slide.notes_text_frame.text
-                image_path = os.path.join(temp_path, 'frame_{}.jpg'.format(i+1))
                 audio_path = os.path.join(temp_path, 'frame_{}.wav'.format(i+1))
-
-                image.save(image_path)
-
                 tts.generate(text=notes,
                              output_file=audio_path)
+                if saveaudio:
+                    continue
+                image_path = os.path.join(temp_path, 'frame_{}.jpg'.format(i+1))
+                image.save(image_path)
 
                 ffmpeg_call(image_path, audio_path, temp_path, i+1)
 
@@ -56,7 +55,7 @@ def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast, 
         video_list_str = 'concat:' + '|'.join(video_list)
         ffmpeg_concat(video_list_str, output_path)
 
-        if saveclips:
+        if saveclips or saveaudio:
             output_path = output_path.replace('.mp4', '-clips')
             print("saveclips option is set")
             if not os.path.exists(output_path):
@@ -64,7 +63,10 @@ def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast, 
 
             src_path = Path(temp_path)
             dest_path = Path(output_path)
-            for each_file in src_path.glob('*.mp4'):
+            glob = src_path.glob('*.mp4')
+            if saveaudio:
+                glob = src_path.glob('*.wav')
+            for each_file in glob:
                 print("Moving % s to % s" % (each_file.name, output_path))
                 each_file.rename(dest_path.joinpath(each_file.name))
 
@@ -92,6 +94,7 @@ def main():
     parser.add_argument('-e', '--engine', help='the name of the text to speech engine to use')
     parser.add_argument('-f', '--fast', help='use the text to speech engine of the OS for fast execution at the expense of quality', action='store_true')
     parser.add_argument('-sc', '--saveclips', help='save the clips for each page instead of deleting them', action='store_true')
+    parser.add_argument('-sa', '--saveaudio', help='only generate voice audios', action='store_true')
     parser.add_argument('-p', '--pageno', help='only regenerate the given page number')
     args = parser.parse_args()
 
@@ -108,7 +111,7 @@ def main():
         print('Page list: % s' % pagenos)
 
     ppt_presenter(args.pptx, args.pdf, args.output, args.tempdir, 
-                args.engine, args.fast, args.saveclips, pagenos)
+                args.engine, args.fast, args.saveclips, pagenos, args.saveaudio)
 
 
 if __name__ == '__main__':
