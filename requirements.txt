@@ -1,4 +1,5 @@
 pdf2image
 python-pptx
-TTS # CoquiTTS
+# TTS # CoquiTTS
 gTTS
+git+https://github.com/SWivid/F5-TTS.git@dc2d2d3

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 from pathlib import Path
 import tempfile
 import argparse
@@ -10,7 +11,7 @@ from subprocess import call
 from pdf2image import convert_from_path
 from pptx import Presentation
 from ttsgen import TTSGen
-from engines.xtts2_engine import XTTS2Engine
+from engines.f5_engine import F5Engine
 from engines.gtts_engine import GTTSEngine
 
 __author__ = ['hoangbv15']
@@ -26,7 +27,7 @@ def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast, 
     elif engineName:
         engine = globals()[engineName]
     else:
-        tts = TTSGen(XTTS2Engine())
+        tts = TTSGen(F5Engine())
 
     with tempfile.TemporaryDirectory(dir=temp_dir) as temp_path:
         images_from_path = convert_from_path(pdf_path)
