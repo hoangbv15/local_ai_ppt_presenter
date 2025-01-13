@@ -21,7 +21,7 @@ FFMPEG_NAME = 'ffmpeg'
 #FFMPEG_NAME = 'avconv'
 
 
-def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast, saveclips, pagenos, saveaudio):
+def ppt_presenter(pptx_path, pdf_path, txt_path, output_path, temp_dir, engineName, fast, saveclips, pagenos, saveaudio):
     if fast:
         tts = TTSGen(GTTSEngine())
     elif engineName:
@@ -30,33 +30,44 @@ def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast, 
         tts = TTSGen(F5Engine())
 
     with tempfile.TemporaryDirectory(dir=temp_dir) as temp_path:
-        images_from_path = convert_from_path(pdf_path)
-        prs = Presentation(pptx_path)
-        assert len(images_from_path) == len(prs.slides)
-
         tts.enable(True)
-        for i, (slide, image) in enumerate(zip(prs.slides, images_from_path)):
-            if pagenos and i not in pagenos:
-                continue
 
-            if slide.has_notes_slide:
-                notes = slide.notes_slide.notes_text_frame.text
-                audio_path = os.path.join(temp_path, 'frame_{}.wav'.format(i+1))
-                tts.generate(text=notes,
-                             output_file=audio_path)
-                if saveaudio:
+        if txt_path:
+            with open(txt_path,'r') as script:
+                lines = script.read().splitlines()
+                for i, line in enumerate(lines):
+                    if pagenos and i not in pagenos:
+                        continue
+                    audio_path = os.path.join(temp_path, 'frame_{}.wav'.format(i+1))
+                    tts.generate(text=line,
+                                output_file=audio_path)
+        else:
+            images_from_path = convert_from_path(pdf_path)
+            prs = Presentation(pptx_path)
+            assert len(images_from_path) == len(prs.slides)
+
+            for i, (slide, image) in enumerate(zip(prs.slides, images_from_path)):
+                if pagenos and i not in pagenos:
                     continue
-                image_path = os.path.join(temp_path, 'frame_{}.jpg'.format(i+1))
-                image.save(image_path)
 
-                ffmpeg_call(image_path, audio_path, temp_path, i+1)
+                if slide.has_notes_slide:
+                    notes = slide.notes_slide.notes_text_frame.text
+                    audio_path = os.path.join(temp_path, 'frame_{}.wav'.format(i+1))
+                    tts.generate(text=notes,
+                                output_file=audio_path)
+                    if saveaudio:
+                        continue
+                    image_path = os.path.join(temp_path, 'frame_{}.jpg'.format(i+1))
+                    image.save(image_path)
 
-        video_list = [os.path.join(temp_path, 'frame_{}.ts'.format(i+1)) \
-                      for i in range(len(images_from_path))]
-        video_list_str = 'concat:' + '|'.join(video_list)
-        ffmpeg_concat(video_list_str, output_path)
+                    ffmpeg_call(image_path, audio_path, temp_path, i+1)
 
-        if saveclips or saveaudio:
+            video_list = [os.path.join(temp_path, 'frame_{}.ts'.format(i+1)) \
+                        for i in range(len(images_from_path))]
+            video_list_str = 'concat:' + '|'.join(video_list)
+            ffmpeg_concat(video_list_str, output_path)
+
+        if saveclips or saveaudio or txt_path:
             output_path = output_path.replace('.mp4', '-clips')
             print("saveclips option is set")
             if not os.path.exists(output_path):
@@ -65,7 +76,7 @@ def ppt_presenter(pptx_path, pdf_path, output_path, temp_dir, engineName, fast, 
             src_path = Path(temp_path)
             dest_path = Path(output_path)
             glob = src_path.glob('*.mp4')
-            if saveaudio:
+            if saveaudio or txt_path:
                 glob = src_path.glob('*.wav')
             for each_file in glob:
                 print("Moving % s to % s" % (each_file.name, output_path))
@@ -90,6 +101,7 @@ def main():
     parser = argparse.ArgumentParser(description='Local AI PPT Presenter help.')
     parser.add_argument('--pptx', help='input pptx path')
     parser.add_argument('--pdf', help='input pdf path')
+    parser.add_argument('--txt', help='input txt path')
     parser.add_argument('-o', '--output', help='output path')
     parser.add_argument('-t', '--tempdir', help='path to store temporary files needed to generate the output. A ramdisk is recommended. Leave none to use python tempfile defaults.')
     parser.add_argument('-e', '--engine', help='the name of the text to speech engine to use')
@@ -111,8 +123,11 @@ def main():
         args.saveclips = True
         print('Page list: % s' % pagenos)
 
-    ppt_presenter(args.pptx, args.pdf, args.output, args.tempdir, 
+    ppt_presenter(args.pptx, args.pdf, args.txt, args.output, args.tempdir, 
                 args.engine, args.fast, args.saveclips, pagenos, args.saveaudio)
+
+    # Beeps to notify that the script has finished
+    print('\a')
 
 
 if __name__ == '__main__':

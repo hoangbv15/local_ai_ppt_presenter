@@ -52,7 +52,7 @@ class F5Engine:
         self.nfe_step = 32 #nfe_step
         self.cfg_strength = cfg_strength
         self.sway_sampling_coef = sway_sampling_coef
-        self.speed = 1.5 #speed
+        self.speed = 1.2 #speed
         self.fix_duration = fix_duration
 
         if self.save_chunk:
