@@ -8,12 +8,12 @@ class XTTS2Engine:
         self.tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2")
         self.isInitialised = True
 
-    def generate(self, text, output_file):
+    def generate(self, text, speed, output_file):
         if not self.isInitialised:
             self.initialise()
 
         self.tts.tts_to_file(text=text, 
-                        speaker_wav=["voices/f-us-5.wav"], 
+                        speaker_wav=["voices/hoang_03.wav"], 
                         language="en", 
                         file_path=output_file,
                         top_k=50, top_p=0.8)

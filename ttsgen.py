@@ -8,8 +8,8 @@ class TTSGen:
     def enable(self, enabled):
         self.enabled = enabled
 
-    def generate(self, text, output_file):
+    def generate(self, text, speed, output_file):
         if not self.enabled:
             return
 
-        self.engine.generate(text, output_file)
+        self.engine.generate(text, speed, output_file)

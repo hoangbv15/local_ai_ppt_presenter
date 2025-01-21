@@ -3,6 +3,7 @@
 
 import os
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
+import re
 from pathlib import Path
 import tempfile
 import argparse
@@ -38,8 +39,17 @@ def ppt_presenter(pptx_path, pdf_path, txt_path, output_path, temp_dir, engineNa
                 for i, line in enumerate(lines):
                     if pagenos and i not in pagenos:
                         continue
-                    audio_path = os.path.join(temp_path, 'frame_{}.wav'.format(i+1))
-                    tts.generate(text=line,
+                    match = re.search(r"^s(\d.\d): (.*)", line)
+                    speed = None
+                    filename = 'frame_{}.wav'.format(i+1)
+                    if match:
+                        speed = float(match.group(1))
+                        line  = match.group(2)
+                        filename = 'frame_{}_s{}.wav'.format(i+1, speed)
+                    
+                    audio_path = os.path.join(temp_path, filename)
+
+                    tts.generate(text=line, speed=speed,
                                 output_file=audio_path)
         else:
             images_from_path = convert_from_path(pdf_path)

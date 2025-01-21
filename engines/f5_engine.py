@@ -39,8 +39,28 @@ class F5Engine:
         ckpt_file = ""
         vocab_file = ""
 
-        self.ref_audio = "voices/hoang_03.wav"
-        self.ref_text = "When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors."
+        voices = {
+            "hoang": {
+                "ref_audio": "voices/hoang_03.wav",
+                "ref_text": "When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors."
+            },
+            "kinich_01": {
+                "ref_audio": "voices/kinich_01.wav",
+                "ref_text": "When I camp outdoors, all I require is a bonfire or a cave to rest in. But this place provides both safety and comfort, which is hard come by elsewhere."
+            },
+            "kinich_02": {
+                "ref_audio": "voices/kinich_02.wav",
+                "ref_text": "You'd think that as an almighty dragonlord and supreme ruler, you'd know how to be a good guest as well as a good host."
+            },
+            "kachina": {
+                "ref_audio": "voices/kachina_01.wav",
+                "ref_text": "If you're bored, why don't we take a look at my collection together? If something catches your eye, feel free to take it!"
+            }
+        }
+
+        voice = voices["hoang"]
+        self.ref_audio = voice["ref_audio"]
+        self.ref_text = voice["ref_text"]
 
         self.save_chunk = False
         self.remove_silence = False
@@ -52,7 +72,7 @@ class F5Engine:
         self.nfe_step = 32 #nfe_step
         self.cfg_strength = cfg_strength
         self.sway_sampling_coef = sway_sampling_coef
-        self.speed = 1.2 #speed
+        self.default_speed = 1.3 #speed
         self.fix_duration = fix_duration
 
         if self.save_chunk:
@@ -95,9 +115,14 @@ class F5Engine:
         self.tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2")
         self.isInitialised = True
 
-    def generate(self, gen_text, output_file):
+    def generate(self, gen_text, speed, output_file):
         if not self.isInitialised:
             self.initialise()
+
+        if speed:
+            self.speed = speed
+        else:
+            self.speed = self.default_speed
 
         main_voice = {"ref_audio": self.ref_audio, "ref_text": self.ref_text}
         voices = {"main": main_voice}
